@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Email</title>
+</head>
+<body>
+  <form id="contact-form">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <br>
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" required></textarea>
+    <br>
+    <button type="submit">Send Email</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("P40hwXTc2BcVRaxc6");
+    })();
+
+    document.getElementById('contact-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Collect form data
+      const formData = new FormData(event.target);
+      const data = Object.fromEntries(formData.entries());
+
+      // Send email using EmailJS
+      emailjs.sendForm('service_ixmjf9m', 'template_y0ado1s', this)
+        .then(function() {
+          console.log('SUCCESS!');
+          alert('Email sent successfully!');
+        }, function(error) {                                        
+          console.log('FAILED...', error);
+          alert('Failed to send email.');
+        });
+
+      // Save to Google Sheets
+      fetch('https://script.google.com/macros/s/AKfycbw2CQEzzuZX3LZfzlLCHIqQ69iUU2mXvCpvp0Z8VDBvi59HwQbgZLuqTXonRTAg1TQ8/exec', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then(response => {
+        if (response.ok) {
+          console.log('Data saved to Google Sheets');
+        } else {
+          console.log('Failed to save data to Google Sheets');
+        }
+      }).catch(error => {
+        console.log('Error:', error);
+      });
+    });
+  </script>
+</body>
+</html>
